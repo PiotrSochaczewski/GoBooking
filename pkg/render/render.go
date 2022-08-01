@@ -11,6 +11,7 @@ import (
 	"github.com/PiotrSochaczewski/GoBooking/pkg/models"
 	"github.com/justinas/nosurf"
 )
+var functions = template.FuncMap{}
 
 var app *config.AppConfig
 
@@ -27,7 +28,7 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 //RenderTemplate renders template using html/template
 func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
-	
+
 	//create a template cache (tc)
 	if app.UseCache {
 		//get the template cache from the app config
@@ -41,20 +42,14 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	if !ok {
 		log.Fatal("Could not get template from template cache")
 	}
-	
+
 	buf := new(bytes.Buffer)
 
 	td = AddDefaultData(td, r)
 
-	// //do not change it
-	err := t.Execute(buf, td)
-	if err != nil {
-		log.Println(err)
-	}
-
-	//render the template
-	//do not change it
-	_, err = buf.WriteTo(w)
+	_ = t.Execute(buf, td)
+	
+	_, err := buf.WriteTo(w)
 	if err != nil {
 		log.Println("error writing template to browser", err)
 	}
@@ -74,7 +69,7 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	//range through all files ending with *.page.tmpl
 	for _, page := range pages {
 		name := filepath.Base(page)
-		ts, err := template.New(name).ParseFiles(page)
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			return myCache, err
 		}
