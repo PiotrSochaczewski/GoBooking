@@ -9,6 +9,7 @@ import (
 
 	"github.com/PiotrSochaczewski/GoBooking/pkg/config"
 	"github.com/PiotrSochaczewski/GoBooking/pkg/models"
+	"github.com/justinas/nosurf"
 )
 
 var app *config.AppConfig
@@ -18,17 +19,18 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func AddDefaultData(td *models.TemplateData) *models.TemplateData{
+func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
+	td.CSRFToken = nosurf.Token(r)
 	return td
 }
 
 //RenderTemplate renders template using html/template
-func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
-
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
+	
 	//create a template cache (tc)
-	//get the template cache from the app config
 	if app.UseCache {
+		//get the template cache from the app config
 		tc = app.TemplateCache
 	} else {
 		//tc, err = CreateTemplateCache()
@@ -39,12 +41,12 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData)
 	if !ok {
 		log.Fatal("Could not get template from template cache")
 	}
-
+	
 	buf := new(bytes.Buffer)
 
-	td = AddDefaultData(td)
+	td = AddDefaultData(td, r)
 
-	//do not change it
+	// //do not change it
 	err := t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
@@ -54,7 +56,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData)
 	//do not change it
 	_, err = buf.WriteTo(w)
 	if err != nil {
-		log.Println(err)
+		log.Println("error writing template to browser", err)
 	}
 
 }
