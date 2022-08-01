@@ -1,4 +1,4 @@
-{{ template "base"}}
+{{ template "base" .}}
 
 {{ define "content"}}
     <div class="container">
@@ -37,7 +37,7 @@
 {{define "js"}}
     <script>
         const elem = document.getElementById('reservation-dates');
-        const rangepicker = new DateRangePicker(elem, {
+        const rangePicker = new DateRangePicker(elem, {
             format: "yyyy-mm-dd",
         }); 
     </script>
