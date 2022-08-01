@@ -52,3 +52,35 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 		StringMap: stringMap,
 	})
 }
+
+// Contact is the contact page handler
+func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
+	remoteIP := r.RemoteAddr
+	m.App.Session.Put(r.Context(), "remote_ip", remoteIP)
+
+	render.RenderTemplate(w, "contact.page.tmpl", &models.TemplateData{})
+}
+// MakeReservation is the make reservation page handler
+func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "make-reservation.page.tmpl", &models.TemplateData{})
+}
+
+// Modern is the modern house page handler
+func (m *Repository) Modern(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "modern.page.tmpl", &models.TemplateData{})
+}
+
+// TraditionalHanok is a traditional hanok page handler
+func (m *Repository) TraditionalHanok(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "traditional-hanok.page.tmpl", &models.TemplateData{})
+}
+
+//ModernHanok is a modern hanok page handler
+func (m *Repository) ModernHanok(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "modern-hanok.page.tmpl", &models.TemplateData{})
+}
+//SearchAvailability is a search availability page handler
+func (m *Repository) SearchAvailability(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "search-availability.page.tmpl", &models.TemplateData{})
+}
+

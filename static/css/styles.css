@@ -32,7 +32,7 @@
     box-shadow: none;
 }
 .datepicker {
-    z-index: 10;
+    z-index: 100000;
 }
 
 .datepicker.active {
