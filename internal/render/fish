@@ -1,0 +1,23 @@
+mode: set
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:23.40,25.2 1 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:27.84,33.2 5 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:36.105,40.18 2 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:48.2,49.9 2 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:53.2,60.16 5 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:64.2,64.12 1 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:40.18,43.3 1 0
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:43.8,46.3 1 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:49.9,51.3 1 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:60.16,63.3 2 0
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:67.67,73.16 3 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:78.2,78.29 1 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:99.2,99.21 1 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:73.16,75.3 1 0
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:78.29,81.17 3 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:84.3,85.17 2 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:88.3,88.23 1 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:95.3,95.21 1 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:81.17,83.4 1 0
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:85.17,87.4 1 0
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:88.23,90.18 2 1
+github.com/PiotrSochaczewski/GoBooking/internal/render/render.go:90.18,92.5 1 0
