@@ -2,9 +2,11 @@ package dbrepo
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/PiotrSochaczewski/GoBooking/internal/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (m *postgresDBRepo) AllUsers() bool {
@@ -41,7 +43,7 @@ func (m *postgresDBRepo) InsertReservation(res models.Reservation) (int, error) 
 	return newID, nil
 }
 
-//InsertRoomRestriction inserts a room restriction into the database
+// InsertRoomRestriction inserts a room restriction into the database
 func (m *postgresDBRepo) InsertRoomRestriction(r models.RoomRestriction) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -66,13 +68,13 @@ func (m *postgresDBRepo) InsertRoomRestriction(r models.RoomRestriction) error {
 	return nil
 }
 
-//SearchAvailabilityByDatesByRoomID return true if availability exist for roomID, and false if no availability exists
+// SearchAvailabilityByDatesByRoomID return true if availability exist for roomID, and false if no availability exists
 func (m *postgresDBRepo) SearchAvailabilityByDatesByRoomID(start, end time.Time, roomID int) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	var numRows int
-	
+
 	query := `
 		select
 			count(id)
@@ -84,7 +86,7 @@ func (m *postgresDBRepo) SearchAvailabilityByDatesByRoomID(start, end time.Time,
 
 	row := m.DB.QueryRowContext(ctx, query, roomID, start, end)
 	err := row.Scan(&numRows)
-	if err != nil{
+	if err != nil {
 		return false, err
 	}
 
@@ -95,9 +97,8 @@ func (m *postgresDBRepo) SearchAvailabilityByDatesByRoomID(start, end time.Time,
 	return false, nil
 }
 
-
-//SearchAvailabilityForAllRooms returns slice of available rooms, if any for given date range
-func (m *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time)([]models.Room, error) {
+// SearchAvailabilityForAllRooms returns slice of available rooms, if any for given date range
+func (m *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]models.Room, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -110,7 +111,7 @@ func (m *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time)([]m
 			rooms r
 		where r.id not in 
 			(select rr.room_id from room_restrictions rr where $1 < rr.end_date and $2 > rr.start_date)`
-	
+
 	rows, err := m.DB.QueryContext(ctx, query, start, end)
 	if err != nil {
 		return rooms, err
@@ -128,16 +129,15 @@ func (m *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time)([]m
 
 		rooms = append(rooms, room)
 	}
-	
+
 	if err = rows.Err(); err != nil {
 		return rooms, err
 	}
-	
 
 	return rooms, nil
 }
 
-//GetRoomByID gets a room by id 
+// GetRoomByID gets a room by id
 func (m *postgresDBRepo) GetRoomByID(id int) (models.Room, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -160,4 +160,75 @@ func (m *postgresDBRepo) GetRoomByID(id int) (models.Room, error) {
 	}
 
 	return room, nil
+}
+
+// GetUserByID return user by id
+func (m *postgresDBRepo) GetUserByID(id int) (models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `select id, first_name, last_name, email, password, access_level, created_at, updated_at
+			from users where id = $1`
+
+	row := m.DB.QueryRowContext(ctx, query, id)
+
+	var u models.User
+	err := row.Scan(
+		&u.ID,
+		&u.FirstName,
+		&u.LastName,
+		&u.Email,
+		&u.Password,
+		&u.AccessLevel,
+		&u.CreateAt,
+		&u.UpdateAt,
+	)
+	if err != nil {
+		return u, err
+	}
+	return u, nil
+}
+
+// UpdateUser updates a user in the database
+func (m *postgresDBRepo) UpdateUser(u models.User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+		update users set first_name = $1, last_name = $2, email = $3, access_level = $4, updated_at = $5,`
+
+	_, err := m.DB.ExecContext(ctx, query,
+		u.FirstName,
+		u.LastName,
+		u.Email,
+		u.AccessLevel,
+		time.Now(),
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Authenticate  authenticated user
+func (m *postgresDBRepo) Authenticate(email, testPassword string) (int, string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var id int
+	var hashedPassword string
+
+	row := m.DB.QueryRowContext(ctx, "select id, password from users where email = $1", email)
+	err := row.Scan(&id, &hashedPassword)
+	if err != nil {
+		return id, "", err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(testPassword))
+
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return 0, "", errors.New("incorrect password")
+	} else if err != nil {
+		return 0, "", err
+	}
+	return id, hashedPassword, nil
 }
