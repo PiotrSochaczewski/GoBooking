@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/PiotrSochaczewski/GoBooking/internal/config"
@@ -451,23 +450,7 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "admin-dashboard.page.tmpl", &models.TemplateData{})
 }
 
-// AdminAllReservation show all reservation in admin tool
-func (m *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
-	reservations, err := m.DB.AllReservations()
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
-
-	data := make(map[string]interface{})
-	data["reservations"] = reservations
-
-	render.Template(w, r, "admin-all-reservations.page.tmpl", &models.TemplateData{
-		Data: data,
-	})
-}
-
-// AdminNewReservations show all new reservation in admin tool
+//AdminNewReservations show all new reservation in admin tool
 func (m *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request) {
 	reservations, err := m.DB.AllNewReservations()
 	if err != nil {
@@ -483,87 +466,23 @@ func (m *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request
 
 }
 
-// AdminShowReservation show the reservation in admin tool
-func (m *Repository) AdminShowReservation(w http.ResponseWriter, r *http.Request) {
-	exploded := strings.Split(r.RequestURI, "/")
-	id, err := strconv.Atoi(exploded[4])
+//AdminAllReservation show all reservation in admin tool
+func (m *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
+	reservations, err := m.DB.AllReservations()
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
 	}
 
-	src := exploded[3]
-
-	stringMap := make(map[string]string)
-	stringMap["src"] = src
-
-	//get reservation from database
-	res, err := m.DB.GetReservationByID(id)
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
 	data := make(map[string]interface{})
-	data["reservation"] = res
+	data["reservations"] = reservations
 
-	render.Template(w, r, "admin-reservations-show.page.tmpl", &models.TemplateData{
-		StringMap: stringMap,
-		Data:      data,
-		Form:      forms.New(nil),
+	render.Template(w, r, "admin-all-reservations.page.tmpl", &models.TemplateData{
+		Data: data,
 	})
 }
 
-// AdminPostShowReservation
-func (m *Repository) AdminPostShowReservation(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
-
-	exploded := strings.Split(r.RequestURI, "/")
-
-	id, err := strconv.Atoi(exploded[4])
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
-
-	src := exploded[3]
-
-	stringMap := make(map[string]string)
-	stringMap["src"] = src
-
-	res, err := m.DB.GetReservationByID(id)
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
-
-	res.FirstName = r.Form.Get("first_name")
-	res.LastName = r.Form.Get("last_name")
-	res.Email = r.Form.Get("email")
-	res.Phone = r.Form.Get("phone")
-
-	err = m.DB.UpdateReservation(res)
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
-
-	month := r.Form.Get("month")
-	year := r.Form.Get("year")
-
-	m.App.Session.Put(r.Context(), "flash", "Changes saved")
-
-	if year == "" {
-		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
-	} else {
-		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%s&m=%s", year, month), http.StatusSeeOther)
-	}
-}
-
-// AdminReservationsCalendar display the reservation calendar
 func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "admin-reservations-calendar.page.tmpl", &models.TemplateData{})
 }
+
