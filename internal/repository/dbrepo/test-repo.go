@@ -37,7 +37,7 @@ func (m *testDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]mode
 func (m *testDBRepo) GetRoomByID(id int) (models.Room, error) {
 	var room models.Room
 	if id > 2 {
-		return room, errors.New("Some error")
+		return room, errors.New("some error")
 	}
 
 	return room, nil
@@ -64,10 +64,28 @@ func (m *testDBRepo) AllReservations() ([]models.Reservation, error) {
 	return reservations, nil
 }
 
-//AllNewReservations returns a slice of all reservations
+// AllNewReservations returns a slice of all reservations
 func (m *testDBRepo) AllNewReservations() ([]models.Reservation, error) {
 
 	var reservations []models.Reservation
-	
+
 	return reservations, nil
+}
+
+func (m *testDBRepo) GetReservationByID(id int) (models.Reservation, error) {
+	var res models.Reservation
+
+	return res, nil
+}
+
+func (m *testDBRepo) UpdateReservation(u models.Reservation) error {
+	return nil
+}
+
+func (m *testDBRepo) DeleteReservation(id int) error {
+	return nil
+}
+
+func (m *testDBRepo) UpdateProcessedForReservation(id, processed int) error {
+	return nil
 }
