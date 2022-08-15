@@ -13,10 +13,10 @@ import (
 	"github.com/PiotrSochaczewski/GoBooking/internal/models"
 )
 
-type postData struct {
-	key   string
-	value string
-}
+// type postData struct {
+// 	key   string
+// 	value string
+// }
 
 var theTest = []struct {
 	name               string

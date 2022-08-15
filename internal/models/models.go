@@ -20,8 +20,8 @@ type User struct {
 type Room struct {
 	ID        int
 	RoomName  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreateAt time.Time
+	UpdateAt time.Time
 }
 
 // Restriction is the restriction model
