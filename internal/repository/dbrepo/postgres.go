@@ -237,8 +237,7 @@ func (m *postgresDBRepo) Authenticate(email, testPassword string) (int, string, 
 	return id, hashedPassword, nil
 }
 
-
-//AllReservations returns a slice of all reservations
+// AllReservations returns a slice of all reservations
 func (m *postgresDBRepo) AllReservations() ([]models.Reservation, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -291,7 +290,7 @@ func (m *postgresDBRepo) AllReservations() ([]models.Reservation, error) {
 	return reservations, nil
 }
 
-//AllNewReservations returns a slice of all reservations
+// AllNewReservations returns a slice of all reservations
 func (m *postgresDBRepo) AllNewReservations() ([]models.Reservation, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -344,7 +343,7 @@ func (m *postgresDBRepo) AllNewReservations() ([]models.Reservation, error) {
 	return reservations, nil
 }
 
-//GetReservationByID return one reservation by ID
+// GetReservationByID return one reservation by ID
 func (m *postgresDBRepo) GetReservationByID(id int) (models.Reservation, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -383,7 +382,7 @@ func (m *postgresDBRepo) GetReservationByID(id int) (models.Reservation, error) 
 	return res, nil
 }
 
-//UpdateReservation updates a reservation in the database
+// UpdateReservation updates a reservation in the database
 func (m *postgresDBRepo) UpdateReservation(u models.Reservation) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -409,7 +408,7 @@ func (m *postgresDBRepo) UpdateReservation(u models.Reservation) error {
 	return nil
 }
 
-//DeleteReservation delete one reservation by id
+// DeleteReservation delete one reservation by id
 func (m *postgresDBRepo) DeleteReservation(id int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -424,7 +423,7 @@ func (m *postgresDBRepo) DeleteReservation(id int) error {
 	return nil
 }
 
-//UpdateProcessedForReservation updates processed for a reservation by id
+// UpdateProcessedForReservation updates processed for a reservation by id
 func (m *postgresDBRepo) UpdateProcessedForReservation(id, processed int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -437,4 +436,39 @@ func (m *postgresDBRepo) UpdateProcessedForReservation(id, processed int) error 
 	}
 
 	return nil
+}
+
+func (m *postgresDBRepo) AllRooms() ([]models.Room, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var rooms []models.Room
+
+	query := `select id, room_name, created_at, updated_at from rooms order by room_name`
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return rooms, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var rm models.Room
+		err := rows.Scan(
+			&rm.ID,
+			&rm.RoomName,
+			&rm.CreateAt,
+			&rm.UpdateAt,
+		)
+		if err != nil {
+			return rooms, err
+		}
+		rooms = append(rooms, rm)
+	}
+
+	if err = rows.Err(); err != nil {
+		return rooms, err
+	}
+	return rooms, nil
+
 }
